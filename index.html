@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111612">
+  <meta name="description" content="Dartboard — prosty licznik punktów do darta.">
+  <title>Dartboard — licznik do darta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Dartboard — strona główna">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>DART<span class="brand-light">BOARD</span></span>
+      </a>
+      <div class="topbar-right">
+        <span class="live-indicator"><i></i> MECZ NA ŻYWO</span>
+        <button class="icon-button" id="sound-toggle" type="button" aria-label="Włącz dźwięk" title="Dźwięk">♫</button>
+        <button class="icon-button" id="new-game-top" type="button" aria-label="Nowa gra" title="Nowa gra">＋</button>
+      </div>
+    </header>
+
+    <section class="match-heading">
+      <div>
+        <div class="eyebrow">MECZ • <span id="game-label">501 · DOUBLE OUT</span></div>
+        <h1>Przy tarczy <span class="heading-dot">.</span></h1>
+      </div>
+      <button class="outline-button" id="new-game" type="button"><span>＋</span> Nowa gra</button>
+    </section>
+
+    <section class="scoreboard" aria-label="Wynik meczu">
+      <article class="player-card active" id="player-card-0">
+        <div class="player-topline"><span class="turn-badge" id="turn-badge-0">TERAZ RZUCA</span><span class="leg-count" id="legs-0">0 LEG</span></div>
+        <div class="player-name" id="player-name-0">Gracz 1</div>
+        <div class="score-row"><strong class="player-score" id="score-0">501</strong><span class="score-caption">POZOSTAŁO</span></div>
+        <div class="player-stats"><span>ŚREDNIA <b id="average-0">—</b></span><span>RZUTY <b id="darts-0">0</b></span></div>
+        <div class="score-track"><span id="track-0"></span></div>
+      </article>
+      <div class="versus"><span>VS</span></div>
+      <article class="player-card" id="player-card-1">
+        <div class="player-topline"><span class="turn-badge muted" id="turn-badge-1">OCZEKUJE</span><span class="leg-count" id="legs-1">0 LEG</span></div>
+        <div class="player-name" id="player-name-1">Gracz 2</div>
+        <div class="score-row"><strong class="player-score" id="score-1">501</strong><span class="score-caption">POZOSTAŁO</span></div>
+        <div class="player-stats"><span>ŚREDNIA <b id="average-1">—</b></span><span>RZUTY <b id="darts-1">0</b></span></div>
+        <div class="score-track"><span id="track-1"></span></div>
+      </article>
+    </section>
+
+    <section class="play-layout">
+      <div class="board-panel panel">
+        <div class="panel-heading">
+          <div><div class="eyebrow">WPROWADŹ RZUT</div><h2>Tablica</h2></div>
+          <div class="visit-count"><span id="dart-count">0</span><small>/ 3 RZUTY</small></div>
+        </div>
+        <div class="board-area">
+          <div id="board" class="board" role="group" aria-label="Interaktywna tarcza do darta"></div>
+          <div class="board-hint">Kliknij pole tarczy albo włącz punktowanie z kamery</div>
+        </div>
+        <div class="visit-bar">
+          <div class="visit-darts" id="visit-darts" aria-live="polite">
+            <span class="dart-slot current">—</span><span class="dart-slot">—</span><span class="dart-slot">—</span>
+          </div>
+          <button class="undo-button" id="undo" type="button" disabled>↶ <span>Cofnij</span></button>
+        </div>
+        <div class="camera-row">
+          <div class="camera-copy">
+            <span class="camera-icon" aria-hidden="true">◉</span>
+            <span><b>Kamera</b><small id="camera-status">Automatyczne wykrywanie tarczy</small></span>
+          </div>
+          <button class="camera-button" id="camera-toggle" type="button">WŁĄCZ KAMERĘ</button>
+        </div>
+        <div class="camera-view hidden" id="camera-view">
+          <video id="camera-video" autoplay muted playsinline></video>
+          <svg id="camera-outline" class="camera-outline hidden" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+          <div class="camera-overlay"><span class="scan-ring"></span><span id="scan-label">Przygotowuję kamerę…</span></div>
+        </div>
+      </div>
+
+      <aside class="side-column">
+        <section class="panel keypad-panel">
+          <div class="panel-heading compact">
+            <div><div class="eyebrow">SZYBKIE WPROWADZENIE</div><h2>Wynik wizyty</h2></div>
+          </div>
+          <div class="score-entry">
+            <label class="sr-only" for="score-input">Punkty za rzut</label>
+            <input id="score-input" type="number" min="0" max="180" inputmode="numeric" placeholder="0" autocomplete="off">
+            <button id="submit-score" type="button">DODAJ</button>
+          </div>
+          <div class="quick-scores" aria-label="Szybkie wyniki">
+            <button type="button" data-score="26">26</button><button type="button" data-score="41">41</button>
+            <button type="button" data-score="60">60</button><button type="button" data-score="85">85</button>
+            <button type="button" data-score="100">100</button><button type="button" data-score="140">140</button>
+            <button type="button" data-score="180" class="max-score">180</button><button type="button" data-score="0">PUDŁO</button>
+          </div>
+          <button class="next-turn-button" id="next-turn" type="button" disabled>ZAKOŃCZ WIZYTĘ <span>→</span></button>
+        </section>
+
+        <section class="panel activity-panel">
+          <div class="panel-heading compact">
+            <div><div class="eyebrow">PRZEBIEG MECZU</div><h2>Ostatnie wizyty</h2></div>
+          </div>
+          <div id="history" class="history-list"><div class="empty-history">Pierwszy rzut? Tarcza czeka.</div></div>
+          <div class="checkout-card"><span>CHECKOUT</span><strong id="checkout">—</strong><small id="checkout-hint">Najkrótsza droga do zera</small></div>
+        </section>
+      </aside>
+    </section>
+    <footer><span>GRAJ FAIR. RZUCAJ CELNIE.</span><span id="match-status">X01 · 2 GRACZY</span><button class="license-link" id="about-button" type="button">O PROJEKCIE</button></footer>
+  </main>
+
+  <dialog id="new-game-dialog" class="game-dialog">
+    <form method="dialog" id="new-game-form">
+      <div class="dialog-header"><div><div class="eyebrow">USTAWIENIA MECZU</div><h2>Nowa gra</h2></div><button class="icon-button close-dialog" type="button" aria-label="Zamknij">×</button></div>
+      <label class="field-label">Tryb gry
+        <select id="starting-score"><option value="501">501 — Double out</option><option value="301">301 — Double out</option><option value="701">701 — Double out</option></select>
+      </label>
+      <label class="field-label">Gracz 1<input id="name-input-0" maxlength="24" value="Gracz 1"></label>
+      <label class="field-label">Gracz 2<input id="name-input-1" maxlength="24" value="Gracz 2"></label>
+      <button class="start-button" type="submit">ROZPOCZNIJ MECZ <span>→</span></button>
+    </form>
+  </dialog>
+  <dialog id="dart-confirm-dialog" class="game-dialog confirmation-dialog">
+    <div class="dialog-header"><div><div class="eyebrow">KAMERA · POTWIERDŹ RZUT</div><h2>Gdzie trafiła lotka?</h2></div></div>
+    <p class="confirmation-copy">Jedna kamera nie zawsze widzi dokładnie, gdzie kończy się grot. Wybierz pasujące pole:</p>
+    <div id="dart-candidates" class="dart-candidates"></div>
+    <button class="manual-confirm-button" id="accept-best-guess" type="button">UŻYJ NAJBARDZIEJ PRAWDOPODOBNEGO</button>
+  </dialog>
+  <dialog id="about-dialog" class="game-dialog">
+    <form method="dialog">
+      <div class="dialog-header"><div><div class="eyebrow">INFORMACJE I LICENCJA</div><h2>O projekcie</h2></div><button class="icon-button" aria-label="Zamknij">×</button></div>
+      <p class="confirmation-copy">To zmodyfikowany licznik darta. Kalibracja i wykrywanie rzutów z kamery bazują na projekcie Darts S.A.M. autorstwa Sama Cramphorna.</p>
+      <p class="confirmation-copy"><strong>Based on Darts S.A.M by Sam Cramphorn</strong></p>
+      <p class="confirmation-copy"><a href="https://github.com/SonicSamShop/darts-sam" target="_blank" rel="noopener noreferrer">Kod źródłowy Darts S.A.M</a> · <a href="LICENSE" target="_blank" rel="noopener noreferrer">Licencja GNU AGPL v3</a></p>
+      <p class="confirmation-copy">Darts S.A.M jest wolnym oprogramowaniem; ta aplikacja jest niezależną, zmodyfikowaną wersją i nie jest oficjalną aplikacją Darts S.A.M.</p>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
